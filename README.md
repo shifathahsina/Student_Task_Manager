@@ -6,16 +6,19 @@ A simple and elegant mobile application that helps students manage their tasks e
 
 ## ✨ Features
 
-- ✅ Add New Task with title, description, and due date
-- ✏️ Edit existing tasks
-- ✅ Mark tasks as complete/incomplete
-- 🔍 Search tasks by title
-- 🌓 Light/Dark theme toggle
-- 📅 Due date calendar picker
-- 🔁 Countdown: "2 days left", "Overdue"
-- 📥 Data persistence using AsyncStorage
-- 🗂️ Filter by All / Completed / Pending
-- 💬 Toast messages for Add, Edit, Delete
+- ✅ Add new tasks with title, description, and due date  
+- ✅ Prevent selection of past due dates  
+- ✏️ Edit existing tasks  
+- ✅ Mark tasks as complete/incomplete (by tap or swipe)  
+- 🔍 Search tasks by title  
+- 🌓 Light/Dark theme toggle (applied to all screens)  
+- 📅 Date picker for selecting due dates  
+- 💾 Tasks saved using AsyncStorage (persistent data)  
+- 🗂️ Filter tasks by All / Completed / Pending  
+- 💬 Toast messages for Add, Edit, Delete actions  
+- 👆 Swipe right to complete, left to delete  
+- 🎨 Modern and clean UI with gesture support  
+
 
 ---
 
@@ -23,13 +26,14 @@ A simple and elegant mobile application that helps students manage their tasks e
 
 ![Task Demo](./assets/demo.gif)
 
+---
 
 ## 🚀 How to Run the App
 
 ### 1. Clone the Repository
 
 ```bash
-https://github.com/shifathahsina/Student_Task_Manager.git
+git clone https://github.com/shifathahsina/Student_Task_Manager.git
 cd student-task-manager
 npm install
 npx expo start
