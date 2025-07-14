@@ -26,7 +26,7 @@ A simple and elegant mobile application that helps students manage their tasks e
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/yourusername/student-task-manager.git
+https://github.com/shifathahsina/Student_Task_Manager.git
 cd student-task-manager
 npm install
 npx expo start
