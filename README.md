@@ -19,6 +19,9 @@ A simple and elegant mobile application that helps students manage their tasks e
 
 ---
 
+## 📽️ App Demo
+
+![Task Demo](./assets/demo.gif)
 
 
 ## 🚀 How to Run the App
