@@ -1,6 +1,7 @@
 # 📘 Student Task Manager (React Native)
 
-A simple and elegant mobile application that helps students manage their tasks efficiently. Add, edit, mark complete, filter, and remove tasks — all in a clean and modern UI with theme toggle support. 🌙☀️
+A simple and elegant mobile application that helps students manage their tasks efficiently.  
+Add, edit, mark complete, filter, and remove tasks — all in a clean and modern UI with theme toggle support. 🌙☀️
 
 ---
 
@@ -19,7 +20,6 @@ A simple and elegant mobile application that helps students manage their tasks e
 - 👆 Swipe right to complete, left to delete  
 - 🎨 Modern and clean UI with gesture support  
 
-
 ---
 
 ## 📽️ App Demo
@@ -28,12 +28,17 @@ A simple and elegant mobile application that helps students manage their tasks e
 
 ---
 
-## 🚀 How to Run the App
+## 🚀 Getting Started
 
-### 1. Clone the Repository
+Follow these steps to install and run the app locally:
 
 ```bash
+# 1. Clone the repository
 git clone https://github.com/shifathahsina/Student_Task_Manager.git
-cd student-task-manager
+cd Student_Task_Manager
+
+# 2. Install dependencies
 npm install
+
+# 3. Start the development server
 npx expo start
