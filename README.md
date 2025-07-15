@@ -24,7 +24,7 @@ Add, edit, mark complete, filter, and remove tasks — all in a clean and modern
 
 ## 📽️ App Demo
 
-![Task Demo](./assets/demo.gif)
+![Task Demo](./assets/app_demo.gif)
 
 ---
 
