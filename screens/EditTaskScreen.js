@@ -112,13 +112,15 @@ const EditTaskScreen = ({ tasks, setTasks, theme }) => {
       </TouchableOpacity>
 
       {showPicker && (
-        <DateTimePicker
-          value={dueDate}
-          mode="date"
-          display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-          onChange={onChangeDate}
-        />
-      )}
+  <DateTimePicker
+    value={dueDate}
+    mode="date"
+    display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+    minimumDate={new Date()} // ✅ Prevent selecting past dates
+    onChange={onChangeDate}
+  />
+)}
+
 
       <TouchableOpacity
         style={[styles.button, { backgroundColor: theme.accent }]}

@@ -1,6 +1,10 @@
+// 👇 MUST BE AT THE VERY TOP
+import 'react-native-gesture-handler';
+
 import React, { useEffect, useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import HomeScreen from './screens/HomeScreen';
 import AddTaskScreen from './screens/AddTaskScreen';
@@ -49,41 +53,43 @@ export default function App() {
   }, [tasks]);
 
   return (
-    <NavigationContainer>
-      <Stack.Navigator>
-        <Stack.Screen name="Home">
-          {(props) => (
-            <HomeScreen
-              {...props}
-              tasks={tasks}
-              setTasks={setTasks}
-              theme={theme}
-              isDark={isDark}
-              setIsDark={setIsDark}
-            />
-          )}
-        </Stack.Screen>
-        <Stack.Screen name="AddTask">
-          {(props) => (
-            <AddTaskScreen
-              {...props}
-              tasks={tasks}
-              setTasks={setTasks}
-              theme={theme}
-            />
-          )}
-        </Stack.Screen>
-        <Stack.Screen name="EditTask">
-          {(props) => (
-            <EditTaskScreen
-              {...props}
-              tasks={tasks}
-              setTasks={setTasks}
-              theme={theme}
-            />
-          )}
-        </Stack.Screen>
-      </Stack.Navigator>
-    </NavigationContainer>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <NavigationContainer>
+        <Stack.Navigator>
+          <Stack.Screen name="Home">
+            {(props) => (
+              <HomeScreen
+                {...props}
+                tasks={tasks}
+                setTasks={setTasks}
+                theme={theme}
+                isDark={isDark}
+                setIsDark={setIsDark}
+              />
+            )}
+          </Stack.Screen>
+          <Stack.Screen name="AddTask">
+            {(props) => (
+              <AddTaskScreen
+                {...props}
+                tasks={tasks}
+                setTasks={setTasks}
+                theme={theme}
+              />
+            )}
+          </Stack.Screen>
+          <Stack.Screen name="EditTask">
+            {(props) => (
+              <EditTaskScreen
+                {...props}
+                tasks={tasks}
+                setTasks={setTasks}
+                theme={theme}
+              />
+            )}
+          </Stack.Screen>
+        </Stack.Navigator>
+      </NavigationContainer>
+    </GestureHandlerRootView>
   );
 }

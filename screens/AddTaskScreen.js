@@ -113,13 +113,15 @@ const AddTaskScreen = ({ tasks, setTasks, theme }) => {
       </TouchableOpacity>
 
       {showPicker && (
-        <DateTimePicker
-          value={dueDate}
-          mode="date"
-          display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-          onChange={onChangeDate}
-        />
-      )}
+  <DateTimePicker
+    value={dueDate}
+    mode="date"
+    display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+    minimumDate={new Date()} // ✅ No past dates
+    onChange={onChangeDate}
+  />
+)}
+
 
       {/* Submit Button */}
       <TouchableOpacity

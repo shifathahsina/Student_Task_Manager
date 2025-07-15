@@ -5,7 +5,7 @@ import {
   TextInput,
   TouchableOpacity,
   StyleSheet,
-    FlatList, 
+  FlatList,
   Alert,
   Platform,
   ToastAndroid,
@@ -53,12 +53,12 @@ const HomeScreen = ({ navigation, tasks, setTasks }) => {
   };
 
   const showToast = (message) => {
-  if (Platform.OS === 'android') {
-    ToastAndroid.show(message, ToastAndroid.SHORT);
-  } else {
-    Alert.alert(message);
-  }
-};
+    if (Platform.OS === 'android') {
+      ToastAndroid.show(message, ToastAndroid.SHORT);
+    } else {
+      Alert.alert(message);
+    }
+  };
 
   const filteredTasks = tasks
     .filter((task) => {
@@ -68,7 +68,12 @@ const HomeScreen = ({ navigation, tasks, setTasks }) => {
     })
     .filter((task) =>
       task.title.toLowerCase().includes(searchText.toLowerCase())
-    );
+    )
+    .sort((a, b) => {
+      // Show pending tasks first
+      if (a.completed === b.completed) return 0;
+      return a.completed ? 1 : -1;
+    });
 
   return (
     <View style={[styles.container, { backgroundColor: theme.background }]}>
@@ -141,13 +146,13 @@ const HomeScreen = ({ navigation, tasks, setTasks }) => {
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
           <TaskItem
-  task={item}
-  onDelete={handleDelete}
-  onToggleComplete={handleToggleComplete}
-  onEdit={() => navigation.navigate('EditTask', { task: item })}
-  theme={theme} // ✅ pass the theme!
-/>
-
+            task={item}
+            onDelete={handleDelete}
+            onToggleComplete={handleToggleComplete}
+            onEdit={() => navigation.navigate('EditTask', { task: item })}
+            theme={theme}
+            filter={filter}
+          />
         )}
         ListEmptyComponent={
           <Text style={[styles.empty, { color: theme.placeholder }]}>

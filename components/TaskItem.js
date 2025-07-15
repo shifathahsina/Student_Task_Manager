@@ -4,126 +4,174 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  Pressable,
+  Alert,
 } from 'react-native';
-import { AntDesign, Feather } from '@expo/vector-icons';
-import moment from 'moment';
+import { Feather, MaterialIcons } from '@expo/vector-icons';
+import { Swipeable } from 'react-native-gesture-handler';
 
-const TaskItem = ({ task, onDelete, onToggleComplete, onEdit, theme }) => {
-  const due = moment(task.dueDate);
-  const today = moment().startOf('day');
-  const daysLeft = due.diff(today, 'days');
+export default function TaskItem({ task, onToggleComplete, onDelete, onEdit, theme, filter }) {
+  const showStrike = task.completed && filter === 'all';
 
-  let countdownText = '';
-  if (task.completed) {
-    countdownText = '✅ Completed';
-  } else if (daysLeft === 0) {
-    countdownText = '🕔 Due today';
-  } else if (daysLeft < 0) {
-    countdownText = `⛔ Overdue by ${Math.abs(daysLeft)} day(s)`;
-  } else {
-    countdownText = `⏳ ${daysLeft} day(s) left`;
-  }
+  const handleToggleComplete = () => {
+    if (!task.completed) {
+      Alert.alert(
+        'Confirm Completion',
+        'Is this task completed?',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          { text: 'Yes', onPress: () => onToggleComplete(task.id) },
+        ],
+        { cancelable: true }
+      );
+    } else {
+      onToggleComplete(task.id);
+    }
+  };
+
+  const handleDelete = () => {
+    Alert.alert(
+      'Delete Task',
+      'Are you sure you want to delete this task?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { text: 'Delete', style: 'destructive', onPress: () => onDelete(task.id) },
+      ],
+      { cancelable: true }
+    );
+  };
+
+  // Swipe Left → Delete
+  const renderLeftActions = () => (
+    <TouchableOpacity style={styles.leftAction} onPress={handleDelete}>
+      <MaterialIcons name="delete" size={24} color="white" />
+      <Text style={styles.actionText}>Delete</Text>
+    </TouchableOpacity>
+  );
+
+  // Swipe Right → Complete
+  const renderRightActions = () => (
+    <TouchableOpacity style={styles.rightAction} onPress={handleToggleComplete}>
+      <MaterialIcons name="check-circle" size={24} color="white" />
+      <Text style={styles.actionText}>Complete</Text>
+    </TouchableOpacity>
+  );
 
   return (
-    <View
-      style={[
-        styles.item,
-        {
-          backgroundColor: theme.card,
-          borderLeftColor: theme.accent,
-          shadowColor: theme.accent,
-        },
-      ]}
+    <Swipeable
+      renderLeftActions={renderLeftActions}
+      renderRightActions={renderRightActions}
     >
-      <Pressable
-        onPress={() => onToggleComplete(task.id)}
-        style={styles.checkbox}
-      >
-        {task.completed ? (
-          <AntDesign name="checkcircle" size={24} color="#10B981" />
-        ) : (
-          <AntDesign name="checkcircleo" size={24} color={theme.border} />
-        )}
-      </Pressable>
+      <View style={[styles.card, task.completed && styles.completedCard]}>
+        <View style={styles.left}>
+          {/* ✅ Tap the icon to toggle complete */}
+          <TouchableOpacity onPress={handleToggleComplete}>
+            <MaterialIcons
+              name={task.completed ? 'check-circle' : 'radio-button-unchecked'}
+              size={24}
+              color={task.completed ? '#28C76F' : '#B0B0B0'}
+              style={styles.statusIcon}
+            />
+          </TouchableOpacity>
 
-      <View style={styles.details}>
-        <Text
-          style={[
-            styles.title,
-            {
-              color: task.completed ? '#10B981' : theme.text,
-              textDecorationLine: task.completed ? 'line-through' : 'none',
-            },
-          ]}
-        >
-          {task.title}
-        </Text>
+          <View style={styles.textBox}>
+            <Text style={[styles.title, showStrike && styles.strikeText]} numberOfLines={1}>
+              {task.title}
+            </Text>
+            <Text style={[styles.description, showStrike && styles.strikeText]} numberOfLines={2}>
+              {task.description}
+            </Text>
+            <Text style={styles.dueText}>📅 {task.dueDate}</Text>
 
-        {task.description ? (
-          <Text style={[styles.description, { color: theme.text }]}>
-            {task.description}
-          </Text>
-        ) : null}
+          </View>
+        </View>
 
-        <Text style={[styles.date, { color: theme.text }]}>
-          📅 {task.dueDate}
-        </Text>
-        <Text style={[styles.countdown, { color: theme.accent }]}>
-          {countdownText}
-        </Text>
+        <View style={styles.actions}>
+          <TouchableOpacity onPress={onEdit} style={styles.actionIcon}>
+            <Feather name="edit" size={20} color={theme.accent || '#4B7BE5'} />
+          </TouchableOpacity>
+        </View>
       </View>
-
-      <TouchableOpacity onPress={onEdit} style={styles.action}>
-        <Feather name="edit" size={20} color={theme.accent} />
-      </TouchableOpacity>
-      <TouchableOpacity onPress={() => onDelete(task.id)} style={styles.action}>
-        <AntDesign name="delete" size={20} color="#DC2626" />
-      </TouchableOpacity>
-    </View>
+    </Swipeable>
   );
-};
-
-export default TaskItem;
+}
 
 const styles = StyleSheet.create({
-  item: {
+  card: {
     flexDirection: 'row',
+    backgroundColor: '#F8F9FA',
+    padding: 16,
+    borderRadius: 20,
+    marginBottom: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 5,
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  completedCard: {
+    backgroundColor: '#E9F9ED',
+  },
+  left: {
+    flexDirection: 'row',
+    flex: 1,
     alignItems: 'flex-start',
-    marginBottom: 12,
-    padding: 14,
-    borderRadius: 12,
-    borderLeftWidth: 6,
-    elevation: 3,
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    shadowOffset: { width: 0, height: 2 },
   },
-  checkbox: {
-    marginRight: 12,
-    marginTop: 6,
+  statusIcon: {
+    marginRight: 10,
   },
-  details: {
+  textBox: {
     flex: 1,
   },
   title: {
     fontSize: 17,
     fontWeight: '600',
+    color: '#2C2C2C',
   },
   description: {
     fontSize: 14,
+    color: '#6C757D',
     marginTop: 4,
   },
-  date: {
-    fontSize: 12,
-    marginTop: 4,
-  },
-  countdown: {
+  dueText: {
     fontSize: 13,
-    marginTop: 2,
+    color: '#495057',
+    marginTop: 6,
+    fontStyle: 'italic',
   },
-  action: {
+  strikeText: {
+    textDecorationLine: 'line-through',
+    color: '#A0A0A0',
+  },
+  actions: {
+    flexDirection: 'row',
+    alignItems: 'center',
     marginLeft: 10,
+  },
+  actionIcon: {
+    marginLeft: 12,
+    padding: 4,
+  },
+  leftAction: {
+    backgroundColor: '#E74C3C',
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: 100,
+    borderRadius: 20,
+    marginBottom: 16,
+  },
+  rightAction: {
+    backgroundColor: '#28C76F',
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: 100,
+    borderRadius: 20,
+    marginBottom: 16,
+  },
+  actionText: {
+    color: 'white',
+    fontWeight: '600',
     marginTop: 4,
   },
 });
