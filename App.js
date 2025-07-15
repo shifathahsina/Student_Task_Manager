@@ -5,6 +5,8 @@ import React, { useEffect, useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { StatusBar } from 'expo-status-bar';
+import { SafeAreaProvider } from 'react-native-safe-area-context'; // ✅ NEW
 
 import HomeScreen from './screens/HomeScreen';
 import AddTaskScreen from './screens/AddTaskScreen';
@@ -19,23 +21,45 @@ export default function App() {
   const [isDark, setIsDark] = useState(false);
 
   const lightTheme = {
-    background: '#F3F4F6',
-    text: '#1E3A8A',
+    background: '#FAFBFC',
+    secondaryBackground: '#FFFFFF',
+    text: '#1A202C',
+    secondaryText: '#4A5568',
+    tertiaryText: '#718096',
     card: '#FFFFFF',
-    border: '#D1D5DB',
-    accent: '#1E3A8A',
+    border: '#E2E8F0',
+    accent: '#667EEA',
+    accentLight: '#F0F4FF',
+    success: '#48BB78',
+    successLight: '#F0FFF4',
+    danger: '#F56565',
+    dangerLight: '#FED7D7',
+    warning: '#ED8936',
+    warningLight: '#FEFCF3',
     inputBg: '#FFFFFF',
-    placeholder: '#9CA3AF',
+    placeholder: '#A0AEC0',
+    shadow: '#000000',
   };
 
   const darkTheme = {
-    background: '#111827',
-    text: '#FFFFFF',
-    card: '#1F2937',
-    border: '#374151',
-    accent: '#10B981',
-    inputBg: '#1F2937',
-    placeholder: '#9CA3AF',
+    background: '#0D1117',
+    secondaryBackground: '#161B22',
+    text: '#F0F6FC',
+    secondaryText: '#8B949E',
+    tertiaryText: '#6E7681',
+    card: '#21262D',
+    border: '#30363D',
+    accent: '#58A6FF',
+    accentLight: '#0D1117',
+    success: '#3FB950',
+    successLight: '#0D1117',
+    danger: '#F85149',
+    dangerLight: '#0D1117',
+    warning: '#D29922',
+    warningLight: '#0D1117',
+    inputBg: '#21262D',
+    placeholder: '#6E7681',
+    shadow: '#000000',
   };
 
   const theme = isDark ? darkTheme : lightTheme;
@@ -54,42 +78,58 @@ export default function App() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <NavigationContainer>
-        <Stack.Navigator>
-          <Stack.Screen name="Home">
-            {(props) => (
-              <HomeScreen
-                {...props}
-                tasks={tasks}
-                setTasks={setTasks}
-                theme={theme}
-                isDark={isDark}
-                setIsDark={setIsDark}
-              />
-            )}
-          </Stack.Screen>
-          <Stack.Screen name="AddTask">
-            {(props) => (
-              <AddTaskScreen
-                {...props}
-                tasks={tasks}
-                setTasks={setTasks}
-                theme={theme}
-              />
-            )}
-          </Stack.Screen>
-          <Stack.Screen name="EditTask">
-            {(props) => (
-              <EditTaskScreen
-                {...props}
-                tasks={tasks}
-                setTasks={setTasks}
-                theme={theme}
-              />
-            )}
-          </Stack.Screen>
-        </Stack.Navigator>
-      </NavigationContainer>
+      <SafeAreaProvider>
+        <StatusBar style={isDark ? 'light' : 'dark'} />
+        <NavigationContainer>
+          <Stack.Navigator screenOptions={{
+            headerStyle: {
+              backgroundColor: theme.background,
+              shadowColor: 'transparent',
+              elevation: 0,
+            },
+            headerTintColor: theme.text,
+            headerTitleStyle: {
+              fontWeight: '600',
+              fontSize: 18,
+            },
+            headerBackTitleVisible: false,
+            headerShadowVisible: false,
+          }}>
+            <Stack.Screen name="Home" options={{ headerShown: false }}>
+              {(props) => (
+                <HomeScreen
+                  {...props}
+                  tasks={tasks}
+                  setTasks={setTasks}
+                  theme={theme}
+                  isDark={isDark}
+                  setIsDark={setIsDark}
+                />
+              )}
+            </Stack.Screen>
+            <Stack.Screen name="AddTask" options={{ title: 'Create Task' }}>
+              {(props) => (
+                <AddTaskScreen
+                  {...props}
+                  tasks={tasks}
+                  setTasks={setTasks}
+                  theme={theme}
+                />
+              )}
+            </Stack.Screen>
+            <Stack.Screen name="EditTask" options={{ title: 'Edit Task' }}>
+              {(props) => (
+                <EditTaskScreen
+                  {...props}
+                  tasks={tasks}
+                  setTasks={setTasks}
+                  theme={theme}
+                />
+              )}
+            </Stack.Screen>
+          </Stack.Navigator>
+        </NavigationContainer>
+      </SafeAreaProvider>
     </GestureHandlerRootView>
   );
 }

@@ -9,39 +9,21 @@ import {
   Alert,
   Platform,
   ToastAndroid,
+  Dimensions,
 } from 'react-native';
-import { AntDesign } from '@expo/vector-icons';
+import { SafeAreaView } from 'react-native-safe-area-context'; // ✅ NEW IMPORT
+import { MaterialIcons } from '@expo/vector-icons';
 import TaskItem from '../components/TaskItem';
 
-const lightTheme = {
-  background: '#F3F4F6',
-  text: '#1E3A8A',
-  card: '#FFFFFF',
-  border: '#D1D5DB',
-  accent: '#1E3A8A',
-  inputBg: '#FFFFFF',
-  placeholder: '#9CA3AF',
-};
+const { width } = Dimensions.get('window');
 
-const darkTheme = {
-  background: '#111827',
-  text: '#FFFFFF',
-  card: '#1F2937',
-  border: '#374151',
-  accent: '#10B981',
-  inputBg: '#1F2937',
-  placeholder: '#9CA3AF',
-};
-
-const HomeScreen = ({ navigation, tasks, setTasks }) => {
+const HomeScreen = ({ navigation, tasks, setTasks, theme, isDark, setIsDark }) => {
   const [searchText, setSearchText] = useState('');
-  const [filter, setFilter] = useState('all'); // all | completed | pending
-  const [isDark, setIsDark] = useState(false);
-  const theme = isDark ? darkTheme : lightTheme;
+  const [filter, setFilter] = useState('all');
 
   const handleDelete = (id) => {
     setTasks(tasks.filter((task) => task.id !== id));
-    showToast('Task deleted.');
+    showToast('Task deleted');
   };
 
   const handleToggleComplete = (id) => {
@@ -70,71 +52,126 @@ const HomeScreen = ({ navigation, tasks, setTasks }) => {
       task.title.toLowerCase().includes(searchText.toLowerCase())
     )
     .sort((a, b) => {
-      // Show pending tasks first
       if (a.completed === b.completed) return 0;
       return a.completed ? 1 : -1;
     });
 
+  const completedTasks = tasks.filter(task => task.completed).length;
+  const totalTasks = tasks.length;
+  const completionPercentage = totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0;
+
+  const filterOptions = [
+    { key: 'all', label: 'All', icon: 'view-list' },
+    { key: 'pending', label: 'Active', icon: 'radio-button-unchecked' },
+    { key: 'completed', label: 'Done', icon: 'check-circle' },
+  ];
+
   return (
-    <View style={[styles.container, { backgroundColor: theme.background }]}>
-      {/* Title */}
+    <SafeAreaView
+      style={[styles.container, { backgroundColor: theme.background }]}
+      edges={['top', 'left', 'right']}
+    >
+      {/* Header */}
       <View style={styles.header}>
-        <Text style={[styles.title, { color: theme.text }]}>
-          📘 Student Task Manager
-        </Text>
+        <View style={styles.headerTop}>
+          <View>
+            <Text style={[styles.greeting, { color: theme.secondaryText }]}>
+              Hello Champ🔥
+            </Text>
+            <Text style={[styles.title, { color: theme.text }]}>
+              Your Tasks
+            </Text>
+          </View>
+
+          <TouchableOpacity
+            onPress={() => setIsDark(!isDark)}
+            style={[styles.themeToggle, { backgroundColor: theme.card, borderColor: theme.border }]}
+          >
+            <MaterialIcons
+              name={isDark ? 'light-mode' : 'dark-mode'}
+              size={20}
+              color={theme.accent}
+            />
+          </TouchableOpacity>
+        </View>
+
+        {/* Progress Card */}
+        <View style={[styles.progressCard, { backgroundColor: theme.card, borderColor: theme.border }]}>
+          <View style={styles.progressHeader}>
+            <Text style={[styles.progressTitle, { color: theme.text }]}>
+              Today's Progress
+            </Text>
+            <Text style={[styles.progressPercentage, { color: theme.accent }]}>
+              {Math.round(completionPercentage)}%
+            </Text>
+          </View>
+
+          <View style={styles.progressBarContainer}>
+            <View style={[styles.progressBar, { backgroundColor: theme.border }]}>
+              <View style={[
+                styles.progressFill,
+                {
+                  backgroundColor: theme.accent,
+                  width: `${completionPercentage}%`
+                }
+              ]} />
+            </View>
+          </View>
+
+          <Text style={[styles.progressText, { color: theme.secondaryText }]}>
+            {completedTasks} of {totalTasks} tasks completed
+          </Text>
+        </View>
       </View>
 
-      {/* Theme Toggle */}
-      <TouchableOpacity
-        onPress={() => setIsDark(!isDark)}
-        style={[styles.toggleButton, { borderColor: theme.accent }]}
-      >
-        <Text style={[styles.toggleText, { color: theme.accent }]}>
-          {isDark ? '☀️ Light Mode' : '🌙 Dark Mode'}
-        </Text>
-      </TouchableOpacity>
-
       {/* Search Bar */}
-      <TextInput
-        style={[
-          styles.searchInput,
-          {
-            backgroundColor: theme.inputBg,
-            borderColor: theme.border,
-            color: theme.text,
-          },
-        ]}
-        placeholder="Search tasks..."
-        placeholderTextColor={theme.placeholder}
-        value={searchText}
-        onChangeText={setSearchText}
-      />
+      <View style={styles.searchContainer}>
+        <View style={[styles.searchBar, { backgroundColor: theme.card, borderColor: theme.border }]}>
+          <MaterialIcons name="search" size={20} color={theme.placeholder} />
+          <TextInput
+            style={[styles.searchInput, { color: theme.text }]}
+            placeholder="Search tasks..."
+            placeholderTextColor={theme.placeholder}
+            value={searchText}
+            onChangeText={setSearchText}
+          />
+          {searchText.length > 0 && (
+            <TouchableOpacity onPress={() => setSearchText('')}>
+              <MaterialIcons name="clear" size={20} color={theme.placeholder} />
+            </TouchableOpacity>
+          )}
+        </View>
+      </View>
 
-      {/* Filter Buttons */}
+      {/* Filter Pills */}
       <View style={styles.filterContainer}>
-        {['all', 'completed', 'pending'].map((key) => (
+        {filterOptions.map((option) => (
           <TouchableOpacity
-            key={key}
+            key={option.key}
             style={[
-              styles.filterButton,
+              styles.filterPill,
               {
-                backgroundColor:
-                  filter === key ? theme.accent : theme.card,
-                borderColor: theme.accent,
+                backgroundColor: filter === option.key ? theme.accent : theme.card,
+                borderColor: filter === option.key ? theme.accent : theme.border,
               },
             ]}
-            onPress={() => setFilter(key)}
+            onPress={() => setFilter(option.key)}
           >
+            <MaterialIcons
+              name={option.icon}
+              size={16}
+              color={filter === option.key ? '#FFFFFF' : theme.accent}
+              style={styles.filterIcon}
+            />
             <Text
               style={[
                 styles.filterText,
                 {
-                  color:
-                    filter === key ? theme.card : theme.accent,
+                  color: filter === option.key ? '#FFFFFF' : theme.accent,
                 },
               ]}
             >
-              {key.charAt(0).toUpperCase() + key.slice(1)}
+              {option.label}
             </Text>
           </TouchableOpacity>
         ))}
@@ -154,21 +191,29 @@ const HomeScreen = ({ navigation, tasks, setTasks }) => {
             filter={filter}
           />
         )}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.listContainer}
         ListEmptyComponent={
-          <Text style={[styles.empty, { color: theme.placeholder }]}>
-            No matching tasks found.
-          </Text>
+          <View style={styles.emptyContainer}>
+            <MaterialIcons name="task-alt" size={48} color={theme.placeholder} />
+            <Text style={[styles.emptyTitle, { color: theme.text }]}>
+              No tasks found
+            </Text>
+            <Text style={[styles.emptySubtitle, { color: theme.secondaryText }]}>
+              {searchText ? 'Try adjusting your search' : 'Create your first task to get started'}
+            </Text>
+          </View>
         }
       />
 
-      {/* Add Button */}
+      {/* Floating Action Button */}
       <TouchableOpacity
-        style={[styles.addButton, { shadowColor: theme.accent }]}
+        style={[styles.fab, { backgroundColor: theme.accent, shadowColor: theme.shadow }]}
         onPress={() => navigation.navigate('AddTask')}
       >
-        <AntDesign name="pluscircle" size={50} color={theme.accent} />
+        <MaterialIcons name="add" size={28} color="#FFFFFF" />
       </TouchableOpacity>
-    </View>
+    </SafeAreaView>
   );
 };
 
@@ -177,65 +222,139 @@ export default HomeScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
   },
   header: {
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    paddingBottom: 16,
+  },
+  headerTop: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
     marginBottom: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
+  },
+  greeting: {
+    fontSize: 16,
+    fontWeight: '500',
+    marginBottom: 4,
   },
   title: {
-    fontSize: 26,
+    fontSize: 32,
     fontWeight: '700',
-    textAlign: 'center',
   },
-  toggleButton: {
-    alignSelf: 'flex-end',
+  themeToggle: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1,
+  },
+  progressCard: {
+    borderRadius: 16,
+    padding: 20,
+    borderWidth: 1,
+  },
+  progressHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     marginBottom: 12,
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    borderRadius: 10,
-    borderWidth: 1.5,
   },
-  toggleText: {
+  progressTitle: {
+    fontSize: 16,
     fontWeight: '600',
+  },
+  progressPercentage: {
+    fontSize: 24,
+    fontWeight: '700',
+  },
+  progressBarContainer: {
+    marginBottom: 8,
+  },
+  progressBar: {
+    height: 8,
+    borderRadius: 4,
+    overflow: 'hidden',
+  },
+  progressFill: {
+    height: '100%',
+    borderRadius: 4,
+  },
+  progressText: {
     fontSize: 14,
+    fontWeight: '500',
+  },
+  searchContainer: {
+    paddingHorizontal: 20,
+    marginBottom: 16,
+  },
+  searchBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderWidth: 1,
   },
   searchInput: {
-    borderRadius: 10,
-    padding: 10,
+    flex: 1,
+    marginLeft: 8,
     fontSize: 16,
-    borderWidth: 1.5,
-    marginBottom: 12,
   },
   filterContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 12,
+    paddingHorizontal: 20,
+    marginBottom: 16,
+    gap: 8,
   },
-  filterButton: {
-    flex: 1,
+  filterPill: {
+    flexDirection: 'row',
     alignItems: 'center',
+    paddingHorizontal: 16,
     paddingVertical: 8,
-    marginHorizontal: 4,
-    borderRadius: 8,
-    borderWidth: 1.5,
+    borderRadius: 20,
+    borderWidth: 1,
+  },
+  filterIcon: {
+    marginRight: 6,
   },
   filterText: {
+    fontSize: 14,
     fontWeight: '600',
   },
-  empty: {
-    marginTop: 20,
-    textAlign: 'center',
-    fontSize: 16,
+  listContainer: {
+    paddingBottom: 100,
   },
-  addButton: {
+  emptyContainer: {
+    alignItems: 'center',
+    paddingTop: 60,
+    paddingHorizontal: 40,
+  },
+  emptyTitle: {
+    fontSize: 20,
+    fontWeight: '600',
+    marginTop: 16,
+    marginBottom: 8,
+  },
+  emptySubtitle: {
+    fontSize: 16,
+    textAlign: 'center',
+    lineHeight: 24,
+  },
+  fab: {
     position: 'absolute',
     bottom: 30,
-    right: 30,
+    right: 20,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
-    shadowOffset: { width: 0, height: 3 },
-    shadowRadius: 6,
-    elevation: 6,
+    shadowRadius: 8,
+    elevation: 8,
   },
 });
